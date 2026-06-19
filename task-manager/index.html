@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM Explorer: Interactive Task Manager</title>
+    <!-- Tailwind CSS for layout and styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto space-y-8">
+        
+        <!-- Header -->
+        <header class="flex justify-between items-center surface p-4 rounded-xl border">
+            <div>
+                <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">
+                    <i class="fa-solid fa-code text-blue-500 mr-2"></i>DOM Explorer
+                </h1>
+                <p class="text-sm text-[var(--text-muted)] mt-1">Interactive Task Manager & Concept Playground</p>
+            </div>
+            
+            <!-- Theme Toggle Button -->
+            <button id="theme-toggle" class="p-3 rounded-full hover:bg-[var(--bg-hover)] transition border border-transparent hover:border-[var(--border-color)]">
+                <i class="fa-solid fa-moon text-xl" id="theme-icon"></i>
+            </button>
+        </header>
+
+        <!-- Educational Section: Attributes vs Properties -->
+        <section class="surface rounded-xl p-6 border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-900/10">
+            <h2 class="text-lg font-bold mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-microscope text-blue-500"></i> Demonstration: Attributes vs Properties
+            </h2>
+            <p class="text-sm mb-4 text-[var(--text-muted)]">
+                HTML <strong class="text-blue-500">Attributes</strong> establish initial element state. DOM <strong class="text-purple-500">Properties</strong> represent the live, current state. Type below to see them diverge.
+            </p>
+            
+            <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
+                <!-- Input with a hardcoded attribute -->
+                <input type="text" id="demo-input" value="Initial State" class="input-base px-4 py-2 rounded-lg w-full md:w-64">
+                <button id="btn-compare" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition font-medium whitespace-nowrap shadow-md">
+                    Log Difference
+                </button>
+            </div>
+            
+            <div id="demo-result" class="mt-4 p-3 bg-[var(--bg-page)] rounded border border-[var(--border-color)] font-mono text-sm hidden">
+                <!-- Populated via JS -->
+            </div>
+        </section>
+
+        <!-- Main Task Manager Section -->
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Left Column: Creation & Filters -->
+            <div class="space-y-6">
+                <!-- Task Creation Form -->
+                <section class="surface rounded-xl p-6 border relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-green-500"></div>
+                    <h2 class="text-lg font-bold mb-4"><i class="fa-solid fa-plus-circle mr-2"></i>Create Task</h2>
+                    
+                    <form id="task-form" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1 text-[var(--text-muted)]">Task Title</label>
+                            <input type="text" id="task-title" required placeholder="e.g., Learn Event Bubbling" class="input-base w-full px-4 py-2 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1 text-[var(--text-muted)]">Category</label>
+                            <select id="task-category" class="input-base w-full px-4 py-2 rounded-lg">
+                                <option value="study">Study</option>
+                                <option value="work">Work</option>
+                                <option value="personal">Personal</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-4 py-2 rounded-lg transition font-bold shadow-md">
+                            Add Task
+                        </button>
+                    </form>
+                </section>
+
+                <!-- Task Controls & Filters (Bonus) -->
+                <section class="surface rounded-xl p-6 border space-y-4">
+                    <h2 class="text-lg font-bold"><i class="fa-solid fa-filter mr-2"></i>Controls</h2>
+                    <input type="text" id="search-input" placeholder="Search tasks..." class="input-base w-full px-4 py-2 rounded-lg">
+                    <div class="flex gap-2">
+                        <button class="filter-btn flex-1 py-1 rounded text-sm bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 font-medium" data-filter="all">All</button>
+                        <button class="filter-btn flex-1 py-1 rounded text-sm bg-[var(--bg-page)] text-[var(--text-muted)] hover:bg-[var(--bg-hover)] transition" data-filter="pending">Pending</button>
+                        <button class="filter-btn flex-1 py-1 rounded text-sm bg-[var(--bg-page)] text-[var(--text-muted)] hover:bg-[var(--bg-hover)] transition" data-filter="completed">Done</button>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Column: Task List -->
+            <div class="lg:col-span-2 flex flex-col h-full">
+                <section class="surface rounded-xl p-6 border flex-1 flex flex-col">
+                    <div class="flex justify-between items-center mb-6 border-b border-[var(--border-color)] pb-4">
+                        <h2 class="text-xl font-bold">Tasks Dashboard</h2>
+                        <!-- Counters -->
+                        <div class="flex gap-4 text-sm font-medium">
+                            <span class="text-blue-500">Total: <span id="count-total">0</span></span>
+                            <span class="text-orange-500">Pending: <span id="count-pending">0</span></span>
+                            <span class="text-green-500">Done: <span id="count-done">0</span></span>
+                        </div>
+                    </div>
+
+                    <!-- 
+                         Requirement: Event Delegation 
+                         Instead of attaching events to every button, we attach ONE listener here.
+                    -->
+                    <ul id="task-list" class="space-y-3 flex-1 overflow-y-auto min-h-[300px] pr-2">
+                        <!-- Task items injected here dynamically -->
+                        <li id="empty-state" class="text-center text-[var(--text-muted)] mt-10">
+                            <i class="fa-solid fa-clipboard-list text-4xl mb-3 opacity-50"></i>
+                            <p>No tasks found. Create one to get started!</p>
+                        </li>
+                    </ul>
+                    
+                    <div class="mt-4 pt-4 border-t border-[var(--border-color)] flex justify-end">
+                        <button id="clear-tasks-btn" class="text-red-500 hover:text-red-700 text-sm font-medium transition flex items-center gap-1">
+                            <i class="fa-solid fa-trash-can"></i> Clear All Tasks
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Event Propagation Demonstration -->
+        <section class="surface rounded-xl p-6 border">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-layer-group text-purple-500"></i> Event Propagation: Bubbling vs Capturing
+            </h2>
+            <p class="text-sm mb-6 text-[var(--text-muted)]">
+                Click the inner button. Watch the console and logs below to see the execution order. Capturing goes down the DOM tree, Bubbling goes up.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Interactive Structure -->
+                <div class="flex items-center justify-center bg-[var(--bg-page)] p-8 rounded-lg border border-[var(--border-color)]">
+                    <div id="prop-grandparent" class="p-8 bg-blue-100 dark:bg-blue-900 border-2 border-blue-400 rounded-xl cursor-pointer relative shadow-lg transition hover:scale-[1.02]">
+                        <span class="absolute top-2 left-2 text-xs font-bold text-blue-800 dark:text-blue-200">Grandparent</span>
+                        
+                        <div id="prop-parent" class="p-8 bg-green-100 dark:bg-green-900 border-2 border-green-400 rounded-xl cursor-pointer relative shadow-md transition hover:scale-[1.02]">
+                            <span class="absolute top-2 left-2 text-xs font-bold text-green-800 dark:text-green-200">Parent</span>
+                            
+                            <button id="prop-child" class="px-6 py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg relative z-10 w-full shadow-lg transition active:scale-95">
+                                Child Button
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Logs -->
+                <div class="flex flex-col gap-4">
+                    <div class="flex-1">
+                        <h4 class="font-bold text-sm mb-2 text-red-500 border-b border-red-200 pb-1">1. Capturing Phase (Top to Bottom)</h4>
+                        <ul id="log-capture" class="text-xs font-mono bg-[var(--bg-page)] p-3 rounded h-28 overflow-y-auto border border-[var(--border-color)] space-y-1"></ul>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-bold text-sm mb-2 text-blue-500 border-b border-blue-200 pb-1">2. Bubbling Phase (Bottom to Top)</h4>
+                        <ul id="log-bubble" class="text-xs font-mono bg-[var(--bg-page)] p-3 rounded h-28 overflow-y-auto border border-[var(--border-color)] space-y-1"></ul>
+                    </div>
+                    <button id="btn-clear-logs" class="self-end px-3 py-1 text-sm bg-[var(--bg-page)] border border-[var(--border-color)] rounded hover:bg-[var(--bg-hover)] transition">Clear Logs</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Browser Rendering Pipeline Visual Section -->
+        <section class="surface rounded-xl p-6 border overflow-hidden">
+            <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                <i class="fa-solid fa-project-diagram text-green-500"></i> Browser Rendering Pipeline
+            </h2>
+            
+            <div class="overflow-x-auto pb-4">
+                <div class="min-w-[800px] flex flex-col items-center gap-4">
+                    
+                    <!-- Top Row: Parsing & Trees -->
+                    <div class="flex w-full justify-center items-center gap-2">
+                        <!-- HTML Flow -->
+                        <div class="flex flex-col items-center">
+                            <div class="pipeline-node border-blue-400">
+                                <i class="fa-brands fa-html5 text-3xl text-blue-500 mb-2"></i>
+                                <h3 class="font-bold text-sm">HTML Document</h3>
+                            </div>
+                            <div class="pipeline-arrow">↓</div>
+                            <div class="pipeline-node border-blue-400 text-xs">
+                                <span class="font-semibold block">Parsing</span>
+                                <span class="text-[var(--text-muted)]">Tokenization</span>
+                            </div>
+                            <div class="pipeline-arrow">↓</div>
+                            <div class="pipeline-node border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.3)]">
+                                <i class="fa-solid fa-sitemap text-2xl text-green-500 mb-1"></i>
+                                <h3 class="font-bold text-sm">DOM Tree</h3>
+                            </div>
+                        </div>
+
+                        <!-- Connector visually joining them -->
+                        <div class="flex flex-col items-center self-end mb-6">
+                            <i class="fa-solid fa-plus text-2xl text-[var(--text-muted)] mx-8"></i>
+                        </div>
+
+                        <!-- CSS Flow -->
+                        <div class="flex flex-col items-center">
+                            <div class="pipeline-node border-purple-400">
+                                <i class="fa-brands fa-css3-alt text-3xl text-purple-500 mb-2"></i>
+                                <h3 class="font-bold text-sm">CSS Stylesheet</h3>
+                            </div>
+                            <div class="pipeline-arrow">↓</div>
+                            <div class="pipeline-node border-purple-400 text-xs">
+                                <span class="font-semibold block">Parsing</span>
+                                <span class="text-[var(--text-muted)]">Resolve Rules</span>
+                            </div>
+                            <div class="pipeline-arrow">↓</div>
+                            <div class="pipeline-node border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+                                <i class="fa-solid fa-network-wired text-2xl text-purple-500 mb-1"></i>
+                                <h3 class="font-bold text-sm">CSSOM Tree</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Combination -> Render Tree -->
+                    <div class="pipeline-arrow mt-[-10px]">↓</div>
+                    
+                    <div class="flex items-center gap-4">
+                        <div class="pipeline-node border-orange-500 bg-orange-50 dark:bg-orange-900/20 w-48 shadow-lg">
+                            <i class="fa-solid fa-object-group text-2xl text-orange-500 mb-2"></i>
+                            <h3 class="font-bold text-sm">Render Tree</h3>
+                            <p class="text-[10px] text-[var(--text-muted)] mt-1">Contains only visible elements + computed styles</p>
+                        </div>
+                        
+                        <div class="pipeline-arrow rotate-[-90deg] md:rotate-0">→</div>
+                        
+                        <div class="pipeline-node border-yellow-500">
+                            <i class="fa-solid fa-ruler-combined text-xl text-yellow-500 mb-1"></i>
+                            <h3 class="font-bold text-sm">Layout</h3>
+                            <p class="text-[10px] text-[var(--text-muted)]">Calculate geometry</p>
+                        </div>
+
+                        <div class="pipeline-arrow rotate-[-90deg] md:rotate-0">→</div>
+
+                        <div class="pipeline-node border-red-500">
+                            <i class="fa-solid fa-paint-roller text-xl text-red-500 mb-1"></i>
+                            <h3 class="font-bold text-sm">Paint</h3>
+                            <p class="text-[10px] text-[var(--text-muted)]">Draw pixels to screen</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    
+    <script src="script.js"></script>
+</body>
+</html>

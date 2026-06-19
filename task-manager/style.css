@@ -1,0 +1,72 @@
+
+        :root[data-theme="light"] {
+            --bg-page: #f3f4f6;       
+            --bg-surface: #ffffff;    
+            --text-main: #1f2937;     
+            --text-muted: #6b7280;   
+            --border-color: #e5e7eb; 
+            --bg-hover: #f9fafb;      
+            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        :root[data-theme="dark"] {
+            --bg-page: #111827;       
+            --bg-surface: #1f2937;    
+            --text-main: #f9fafb;     
+            --text-muted: #9ca3af;   
+            --border-color: #374151;  
+            --bg-hover: #374151;     
+            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        .surface {
+            background-color: var(--bg-surface);
+            border-color: var(--border-color);
+            box-shadow: var(--box-shadow);
+        }
+
+        .input-base {
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+        
+        .input-base:focus {
+            outline: none;
+            border-color: #3b82f6; 
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Animation for newly added tasks using data attributes */
+        li[data-new="true"] {
+            animation: highlightNew 1.5s ease-out forwards;
+        }
+
+        @keyframes highlightNew {
+            0% { background-color: rgba(59, 130, 246, 0.3); transform: translateY(-5px); }
+            100% { background-color: transparent; transform: translateY(0); }
+        }
+
+        /* Styling for the Pipeline Diagram */
+        .pipeline-node {
+            background-color: var(--bg-surface);
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            width: 160px;
+        }
+        .pipeline-arrow {
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            margin: 0.5rem;
+        }
